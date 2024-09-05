@@ -1,0 +1,38 @@
+name: Find difference
+on:
+  workflow_dispatch:
+    inputs:
+      version_1:
+        description: 'Type version need to compare here:'
+        required: true
+        type: string
+      version_2:
+        description: 'Type version need to compare here:'
+        required: true
+        type: string
+jobs:
+  find_difference:
+    name: Find difference
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Convert
+        run: bash convert.sh
+        env:
+          repository: ${{ github.repository }}
+      - name: Generate release info
+        shell: bash
+        run: |
+          echo "
+          **Change log** :point_down:
+          "> ${{ github.workspace }}-CHANGELOG.txt
+      - name: Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          artifacts: |
+          ./release/*.apk
+          name: Revanced & Revanced Extended
+          tag: all
+          bodyFile: ${{ github.workspace }}-CHANGELOG.txt
