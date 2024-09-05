@@ -3,11 +3,19 @@ on:
   workflow_dispatch:
     inputs:
       version_1:
-        description: 'Type version need to compare here:'
+        description: 'Type first version need to compare here:'
         required: true
         type: string
       version_2:
-        description: 'Type version need to compare here:'
+        description: 'Type second version need to compare here:'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      version_1:
+        required: true
+        type: string
+      version_2:
         required: true
         type: string
 jobs:
@@ -18,10 +26,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Convert
-        run: bash convert.sh
+      - name: Find difference
+        run: bash src/find_release.sh
         env:
           repository: ${{ github.repository }}
+          first_version: ${{ github.event.inputs.version_1 }}
+          second_version: ${{ github.event.inputs.version_2 }}
       - name: Generate release info
         shell: bash
         run: |
